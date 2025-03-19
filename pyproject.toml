@@ -1,0 +1,24 @@
+[project]
+name = "langchain-naver-community"
+version = "0.1.0"
+description = "Add your description here"
+author = [
+    { name="Changyong Um", email=""}
+]
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "aiohttp>=3.10.11",
+    "langchain>=0.0.27",
+    "pydantic>=2.10.6",
+]
+
+[project.ruls]
+Repository = "https://github.com/e7217/langchain-naver-community"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+license-files = []
