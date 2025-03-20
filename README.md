@@ -3,7 +3,7 @@ To install `langchain-naver-community`, simply run the following command:
 ```python
 pip install -U langchain-naver-community
 ```
-### Credentials
+### Setting Up Credentials
 Setting Up Credentials
 To use Naver's APIs, you need to set up your API credentials. You can obtain a **Naver API Key** by signing up at the [Naver Developers](https://developers.naver.com/main/) website and creating an application.
 
