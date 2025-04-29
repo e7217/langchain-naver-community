@@ -134,3 +134,14 @@ class NaverWebSearch(NaverSearchResults):
         "Input should be a search query in Korean or English."
     )
     search_type: str = "webkr"
+
+class NaverBookSearch(NaverSearchResults):
+    """Tool specialized for Naver Book search."""
+
+    name: str = "naver_book_search"
+    description: str = (
+        "A search engine for Korean books using Naver's search API. "
+        "Useful for when you need to find Korean books and general information. "
+        "Input should be a search query in Korean or English."
+    )
+    search_type: str = "book"
