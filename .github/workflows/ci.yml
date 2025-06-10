@@ -7,8 +7,9 @@ on:
     branches: [ main, develop ]
 
 jobs:
-  test:
+  lint:
     runs-on: ubuntu-latest
+    name: Lint & Type Check
 
     steps:
     - uses: actions/checkout@v4
@@ -25,20 +26,44 @@ jobs:
 
     - name: Install dependencies
       run: |
-        uv sync --extra test
+        uv pip install --system -e ".[test]"
 
-    - name: Run ruff (linter and formatter)
+    - name: Run ruff (linter)
       run: |
         uvx ruff check .
-        uvx ruff format .
+
+    - name: Run ruff (formatter check)
+      run: |
+        uvx ruff format --check .
 
     - name: Run mypy (type checking)
       run: |
         uvx mypy langchain_naver_community
 
+  test:
+    runs-on: ubuntu-latest
+    name: Tests
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v2
+      with:
+        version: "latest"
+
+    - name: Install dependencies
+      run: |
+        uv pip install --system -e ".[test]"
+
     - name: Run tests with pytest
       run: |
-        uv run pytest --cov=langchain_naver_community --cov-report=xml --cov-report=term-missing tests/
+        pytest --cov=langchain_naver_community --cov-report=xml --cov-report=term-missing
       env:
         NAVER_CLIENT_ID: test_client_id
         NAVER_CLIENT_SECRET: test_client_secret
