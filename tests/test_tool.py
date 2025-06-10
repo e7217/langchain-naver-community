@@ -27,13 +27,15 @@ class TestNaverSearchResults:
                 "description": "Test Description",
             }
         ]
-        wrapper.results_async = AsyncMock(return_value=[
-            {
-                "title": "Test Title Async",
-                "link": "https://example.com",
-                "description": "Test Description Async",
-            }
-        ])
+        wrapper.results_async = AsyncMock(
+            return_value=[
+                {
+                    "title": "Test Title Async",
+                    "link": "https://example.com",
+                    "description": "Test Description Async",
+                }
+            ]
+        )
         return wrapper
 
     @pytest.fixture
@@ -54,12 +56,7 @@ class TestNaverSearchResults:
 
     def test_tool_initialization_with_params(self):
         """Test tool initialization with custom parameters."""
-        tool = NaverSearchResults(
-            search_type="blog",
-            display=20,
-            start=5,
-            sort="date"
-        )
+        tool = NaverSearchResults(search_type="blog", display=20, start=5, sort="date")
         assert tool.search_type == "blog"
         assert tool.display == 20
         assert tool.start == 5
@@ -68,13 +65,9 @@ class TestNaverSearchResults:
     def test_run_success(self, search_tool, mock_api_wrapper):
         """Test successful synchronous search."""
         result = search_tool._run("test query")
-        
+
         mock_api_wrapper.results.assert_called_once_with(
-            "test query",
-            search_type="news",
-            display=10,
-            start=1,
-            sort="sim"
+            "test query", search_type="news", display=10, start=1, sort="sim"
         )
         assert result == [
             {
@@ -87,7 +80,7 @@ class TestNaverSearchResults:
     def test_run_exception(self, search_tool, mock_api_wrapper):
         """Test handling of exceptions during synchronous search."""
         mock_api_wrapper.results.side_effect = Exception("API Error")
-        
+
         result = search_tool._run("test query")
         assert result == "Exception('API Error')"
 
@@ -95,13 +88,9 @@ class TestNaverSearchResults:
     async def test_arun_success(self, search_tool, mock_api_wrapper):
         """Test successful asynchronous search."""
         result = await search_tool._arun("test query")
-        
+
         mock_api_wrapper.results_async.assert_called_once_with(
-            "test query",
-            search_type="news",
-            display=10,
-            start=1,
-            sort="sim"
+            "test query", search_type="news", display=10, start=1, sort="sim"
         )
         assert result == [
             {
@@ -115,7 +104,7 @@ class TestNaverSearchResults:
     async def test_arun_exception(self, search_tool, mock_api_wrapper):
         """Test handling of exceptions during asynchronous search."""
         mock_api_wrapper.results_async.side_effect = Exception("Async API Error")
-        
+
         result = await search_tool._arun("test query")
         assert result == "Exception('Async API Error')"
 
@@ -176,7 +165,7 @@ class TestSpecializedSearchTools:
             NaverWebSearch(),
             NaverBookSearch(),
         ]
-        
+
         for tool in tools:
             tool.api_wrapper = mock_api_wrapper
             result = tool._run("test query")
