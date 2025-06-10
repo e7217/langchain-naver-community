@@ -22,27 +22,17 @@ jobs:
       with:
         python-version: "3.11"
 
-    - name: Update version from release tag
-      run: |
-        VERSION=${GITHUB_REF#refs/tags/v}
-        echo "Updating version from tag to: $VERSION"
-        
-        sed -i "s/version = \".*\"/version = \"$VERSION\"/" pyproject.toml
-        
-        echo "Updated pyproject.toml version:"
-        grep "version = " pyproject.toml
-
     - name: Install build dependencies
-      run: pip install build twine
+      run: pip install build twine hatch
 
     - name: Build package
-      run: python -m build
+      run: |
+        VERSION=${GITHUB_REF#refs/tags/v}
+        hatch version $VERSION
+        hatch build
 
     - name: Check package
       run: twine check dist/*
 
     - name: Publish to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_API_TOKEN }}

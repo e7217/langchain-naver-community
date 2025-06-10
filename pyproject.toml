@@ -1,3 +1,7 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
 [project]
 name = "langchain-naver-community"
 version = "0.1.1"
@@ -23,42 +27,14 @@ test = [
     "pytest-cov>=4.1.0",
 ]
 
-[tool.semantic_release]
-version_toml = ["pyproject.toml:project.version"]
-build_command = "python -m build --sdist --wheel ."
-commit_parser = "conventional"
-tag_format = "v{version}"
-upload_to_vcs_release = true
-allow_zero_version = true
-
-[tool.semantic_release.changelog]
-changelog_file = "CHANGELOG.md"
-exclude_commit_patterns = [
-    '''chore(?:\([^)]*?\))?: .+''',
-    '''ci(?:\([^)]*?\))?: .+''',
-    '''refactor(?:\([^)]*?\))?: .+''',
-    '''style(?:\([^)]*?\))?: .+''',
-    '''test(?:\([^)]*?\))?: .+''',
-    '''build(?:\([^)]*?\))?: .+''',
-    '''docs(?:\([^)]*?\))?: .+''',
-]
-
-[tool.semantic_release.commit_parser_options]
-minor_tags = ["feat"]
-patch_tags = ["fix"]
-
-[tool.semantic_release.remote]
-type = "github"
+[tool.hatch.build.targets.wheel]
+sources = ["langchain-naver-community"]
 
 [tool.uv]
 package = true
 
 [project.urls]
 Repository = "https://github.com/e7217/langchain-naver-community"
-
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
 
 [tool.pytest.ini_options]
 minversion = "7.0"
