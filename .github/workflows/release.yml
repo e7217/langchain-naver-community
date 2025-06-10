@@ -1,18 +1,16 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - 'v*'
+  release:
+    types: [published]
   workflow_dispatch:
 
 jobs:
-  release:
+  deploy:
     runs-on: ubuntu-latest
-    concurrency: release
     permissions:
       id-token: write
-      contents: write
+      contents: read
 
     steps:
     - uses: actions/checkout@v4
@@ -25,38 +23,6 @@ jobs:
       with:
         python-version: "3.11"
 
-    - name: Install Python Semantic Release
-      run: pip install python-semantic-release
-
-    - name: Get version from tag
-      id: get_version
-      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
-
-    - name: Generate changelog
-      id: changelog
-      run: |
-        pip install python-semantic-release
-        semantic-release changelog --unreleased > RELEASE_CHANGELOG.md
-        echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
-        cat RELEASE_CHANGELOG.md >> $GITHUB_OUTPUT
-        echo "EOF" >> $GITHUB_OUTPUT
-
-    - name: Create GitHub Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ steps.get_version.outputs.VERSION }}
-        body: ${{ steps.changelog.outputs.CHANGELOG }}
-        draft: false
-        prerelease: false
-
-    # - name: Install uv
-    #   uses: astral-sh/setup-uv@v6
-    #   with:
-    #     version: "latest"
 
     - name: Install build dependencies
       run: pip install build twine
