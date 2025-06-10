@@ -55,7 +55,7 @@ jobs:
 
     - name: Run tests with pytest
       run: |
-        uv run pytest --cov=langchain_naver_community --cov-branch --cov-report=xml --cov-report=term-missing
+        uv run pytest --cov=langchain_naver_community --cov-branch --cov-report=xml --cov-report=term-missing --junitxml=junit.xml -o junit_family=legacy
       env:
         NAVER_CLIENT_ID: test_client_id
         NAVER_CLIENT_SECRET: test_client_secret
@@ -67,3 +67,9 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
         slug: e7217/langchain-naver-community
         # fail_ci_if_error: false
+    
+    - name: Upload test results to Codecov
+      if: ${{ !cancelled() }}
+      uses: codecov/test-results-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
