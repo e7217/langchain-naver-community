@@ -1,5 +1,7 @@
 # 🦜️🔗Langchain Naver Community
 
+[![codecov](https://codecov.io/gh/e7217/langchain-naver-community/graph/badge.svg?token=EE9Q31AS6J)](https://codecov.io/gh/e7217/langchain-naver-community)
+
 ## Welcome
 **Langchain Naver Community** is a Python package that integrates Naver's various APIs with LangChain, making it easier to build powerful applications using Naver's services within the LangChain ecosystem. This package provides a seamless interface to interact with Naver's APIs while leveraging LangChain's capabilities for building language model applications.
 
