@@ -2,10 +2,9 @@ name: Release
 
 on:
   push:
-    branches: [main]
+    tags:
+      - 'v*'
   workflow_dispatch:
-  # release:
-  #   types: [published]
 
 jobs:
   release:
@@ -29,11 +28,30 @@ jobs:
     - name: Install Python Semantic Release
       run: pip install python-semantic-release
 
-    - name: Release
-      id: release
-      run: semantic-release version
+    - name: Get version from tag
+      id: get_version
+      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+    - name: Generate changelog
+      id: changelog
+      run: |
+        pip install python-semantic-release
+        semantic-release changelog --unreleased > RELEASE_CHANGELOG.md
+        echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
+        cat RELEASE_CHANGELOG.md >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
       env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ steps.get_version.outputs.VERSION }}
+        body: ${{ steps.changelog.outputs.CHANGELOG }}
+        draft: false
+        prerelease: false
 
     # - name: Install uv
     #   uses: astral-sh/setup-uv@v6
@@ -41,17 +59,13 @@ jobs:
     #     version: "latest"
 
     - name: Install build dependencies
-      if: steps.release.outputs.released == 'true'
-      run: uv pip install --system build twine
+      run: pip install build twine
 
     - name: Build package
-      if: steps.release.outputs.released == 'true'
       run: python -m build
 
     - name: Check package
-      if: steps.release.outputs.released == 'true'
       run: twine check dist/*
 
     - name: Publish to PyPI
-      if: steps.release.outputs.released == 'true'
       uses: pypa/gh-action-pypi-publish@release/v1
