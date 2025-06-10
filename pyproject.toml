@@ -28,6 +28,12 @@ test = [
     "pytest-cov>=4.1.0",
 ]
 
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.version.vcs]
+tag-pattern = "v(?P<version>.+)" 
+
 [tool.hatch.build.targets.wheel]
 sources = ["langchain-naver-community"]
 
