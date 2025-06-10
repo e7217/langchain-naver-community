@@ -124,9 +124,10 @@ class NaverSearchAPIWrapper(BaseModel):
                 "X-Naver-Client-Secret": self.naver_client_secret.get_secret_value(),
             }
 
-            async with aiohttp.ClientSession() as session, session.get(
-                url, headers=headers
-            ) as response:
+            async with (
+                aiohttp.ClientSession() as session,
+                session.get(url, headers=headers) as response,
+            ):
                 if response.status == 200:
                     return await response.text()
                 msg = f"Error {response.status}: {response.reason}"
