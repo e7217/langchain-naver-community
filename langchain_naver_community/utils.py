@@ -4,10 +4,12 @@ In order to set this up, follow instructions at:
 https://developers.naver.com/docs/serviceapi/search/news/news.md
 """
 
+from __future__ import annotations
+
 import json
-from typing import Dict, List, Optional
-import urllib.request
 import urllib.parse
+import urllib.request
+from typing import Any
 
 import aiohttp
 from langchain_core.utils import get_from_dict_or_env
@@ -35,7 +37,7 @@ class NaverSearchAPIWrapper(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def validate_environment(cls, values: Dict) -> Dict:
+    def validate_environment(cls, values: dict[str, Any]) -> dict[str, Any]:
         """Validate that api key and endpoint exists in environment."""
         naver_client_id = get_from_dict_or_env(
             values, "naver_client_id", "NAVER_CLIENT_ID"
@@ -52,10 +54,10 @@ class NaverSearchAPIWrapper(BaseModel):
         self,
         query: str,
         search_type: str = "news",
-        display: Optional[int] = 10,
-        start: Optional[int] = 1,
-        sort: Optional[str] = "sim",  # sim (similarity) or date
-    ) -> Dict:
+        display: int | None = 10,
+        start: int | None = 1,
+        sort: str | None = "sim",  # sim (similarity) or date
+    ) -> dict[str, Any]:
         """Get raw results from the Naver Search API."""
         enc_text = urllib.parse.quote(query, encoding="utf-8")
         url = f"{NAVER_API_URL}/{search_type}.json?query={enc_text}&display={display}&start={start}&sort={sort}"
@@ -72,17 +74,17 @@ class NaverSearchAPIWrapper(BaseModel):
         if response_code == 200:
             response_body = response.read().decode("utf-8")
             return json.loads(response_body)
-        else:
-            raise Exception(f"Error Code: {response_code}")
+        msg = f"Error Code: {response_code}"
+        raise Exception(msg)
 
     def results(
         self,
         query: str,
         search_type: str = "news",
-        display: Optional[int] = 10,
-        start: Optional[int] = 1,
-        sort: Optional[str] = "sim",
-    ) -> List[Dict]:
+        display: int | None = 10,
+        start: int | None = 1,
+        sort: str | None = "sim",
+    ) -> list[dict[str, Any]]:
         """Run query through Naver Search and return cleaned results.
 
         Args:
@@ -108,10 +110,10 @@ class NaverSearchAPIWrapper(BaseModel):
         self,
         query: str,
         search_type: str = "news",
-        display: Optional[int] = 10,
-        start: Optional[int] = 1,
-        sort: Optional[str] = "sim",
-    ) -> Dict:
+        display: int | None = 10,
+        start: int | None = 1,
+        sort: str | None = "sim",
+    ) -> dict[str, Any]:
         """Get results from the Naver Search API asynchronously."""
         enc_text = urllib.parse.quote(query)
         url = f"{NAVER_API_URL}/{search_type}.json?query={enc_text}&display={display}&start={start}&sort={sort}"
@@ -122,13 +124,13 @@ class NaverSearchAPIWrapper(BaseModel):
                 "X-Naver-Client-Secret": self.naver_client_secret.get_secret_value(),
             }
 
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url, headers=headers) as response:
-                    if response.status == 200:
-                        data = await response.text()
-                        return data
-                    else:
-                        raise Exception(f"Error {response.status}: {response.reason}")
+            async with aiohttp.ClientSession() as session, session.get(
+                url, headers=headers
+            ) as response:
+                if response.status == 200:
+                    return await response.text()
+                msg = f"Error {response.status}: {response.reason}"
+                raise Exception(msg)
 
         results_json_str = await fetch()
         return json.loads(results_json_str)
@@ -137,10 +139,10 @@ class NaverSearchAPIWrapper(BaseModel):
         self,
         query: str,
         search_type: str = "news",
-        display: Optional[int] = 10,
-        start: Optional[int] = 1,
-        sort: Optional[str] = "sim",
-    ) -> List[Dict]:
+        display: int | None = 10,
+        start: int | None = 1,
+        sort: str | None = "sim",
+    ) -> list[dict[str, Any]]:
         """Get cleaned results from Naver Search API asynchronously."""
         results_json = await self.raw_results_async(
             query=query,
@@ -151,9 +153,9 @@ class NaverSearchAPIWrapper(BaseModel):
         )
         return self.clean_results(results_json["items"])
 
-    def clean_results(self, results: List[Dict]) -> List[Dict]:
+    def clean_results(self, results: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Clean results from Naver Search API."""
-        clean_results = []
+        clean_results: list[dict[str, Any]] = []
         for result in results:
             # Remove HTML tags from title and description
             title = result.get("title", "").replace("<b>", "").replace("</b>", "")
