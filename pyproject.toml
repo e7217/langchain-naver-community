@@ -3,6 +3,11 @@ name = "langchain-naver-community"
 version = "0.1.1"
 authors = [{ name = "Changyong Um", email = "eum6211@gmail.com" }]
 description = "Add your description here"
+license = "MIT"
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License"
+]
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
@@ -18,8 +23,32 @@ test = [
     "pytest-cov>=4.1.0",
 ]
 
-[tool.setuptools]
-license-files = []
+[tool.semantic_release]
+version_toml = ["pyproject.toml:project.version"]
+build_command = "python -m build --sdist --wheel ."
+commit_parser = "conventional"
+tag_format = "v{version}"
+upload_to_vcs_release = true
+allow_zero_version = true
+
+[tool.semantic_release.changelog]
+changelog_file = "CHANGELOG.md"
+exclude_commit_patterns = [
+    '''chore(?:\([^)]*?\))?: .+''',
+    '''ci(?:\([^)]*?\))?: .+''',
+    '''refactor(?:\([^)]*?\))?: .+''',
+    '''style(?:\([^)]*?\))?: .+''',
+    '''test(?:\([^)]*?\))?: .+''',
+    '''build(?:\([^)]*?\))?: .+''',
+    '''docs(?:\([^)]*?\))?: .+''',
+]
+
+[tool.semantic_release.commit_parser_options]
+minor_tags = ["feat"]
+patch_tags = ["fix"]
+
+[tool.semantic_release.remote]
+type = "github"
 
 [tool.uv]
 package = true
