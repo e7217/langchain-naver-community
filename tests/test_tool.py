@@ -129,6 +129,79 @@ class TestSpecializedSearchTools:
         assert tool.search_type == "news"
         assert "news" in tool.description.lower()
 
+    def test_naver_news_search_with_date_filter(self):
+        """Test NaverNewsSearch with date filtering."""
+        wrapper = Mock(spec=NaverSearchAPIWrapper)
+        wrapper.results.return_value = [
+            {
+                "title": "Test News",
+                "link": "https://news.example.com/1",
+                "description": "Test Description",
+                "pubDate": "Tue, 10 Dec 2024 09:30:00 +0900",
+            },
+            {
+                "title": "Another News",
+                "link": "https://news.example.com/2",
+                "description": "Another Description",
+                "pubDate": "Wed, 11 Dec 2024 10:30:00 +0900",
+            },
+        ]
+
+        tool = NaverNewsSearch()
+        tool.api_wrapper = wrapper
+
+        # Test with date filter
+        result = tool._run("test query", target_date="2024-12-10", min_results=5)
+
+        # Should filter to only news from 2024-12-10
+        assert len(result) >= 1
+        assert any("Test News" in str(item) for item in result)
+
+    def test_naver_news_search_invalid_date(self):
+        """Test NaverNewsSearch with invalid date format."""
+        tool = NaverNewsSearch()
+
+        # Test with invalid date format
+        result = tool._run("test query", target_date="invalid-date")
+        assert "Invalid date format" in str(result)
+
+    def test_naver_news_search_no_date_filter(self):
+        """Test NaverNewsSearch without date filtering."""
+        wrapper = Mock(spec=NaverSearchAPIWrapper)
+        wrapper.results.return_value = [{"title": "Test News"}]
+
+        tool = NaverNewsSearch()
+        tool.api_wrapper = wrapper
+
+        # Test without date filter
+        result = tool._run("test query")
+
+        wrapper.results.assert_called_once_with(
+            "test query", search_type="news", display=10, start=1, sort="sim"
+        )
+        assert result == [{"title": "Test News"}]
+
+    @pytest.mark.asyncio
+    async def test_naver_news_search_async_with_date(self):
+        """Test NaverNewsSearch async with date filtering."""
+        wrapper = Mock(spec=NaverSearchAPIWrapper)
+        wrapper.results_async = AsyncMock(
+            return_value=[
+                {
+                    "title": "Async News",
+                    "link": "https://news.example.com/async",
+                    "description": "Async Description",
+                    "pubDate": "Tue, 10 Dec 2024 09:30:00 +0900",
+                }
+            ]
+        )
+
+        tool = NaverNewsSearch()
+        tool.api_wrapper = wrapper
+
+        result = await tool._arun("test query", target_date="2024-12-10")
+        assert len(result) >= 1
+
     def test_naver_blog_search(self):
         """Test NaverBlogSearch initialization."""
         tool = NaverBlogSearch()
@@ -160,7 +233,6 @@ class TestSpecializedSearchTools:
     def test_specialized_tools_inherit_functionality(self, mock_api_wrapper):
         """Test that specialized tools inherit base functionality."""
         tools = [
-            NaverNewsSearch(),
             NaverBlogSearch(),
             NaverWebSearch(),
             NaverBookSearch(),
@@ -170,3 +242,9 @@ class TestSpecializedSearchTools:
             tool.api_wrapper = mock_api_wrapper
             result = tool._run("test query")
             assert result == [{"title": "Specialized Result"}]
+
+        # Test NaverNewsSearch separately due to different method signature
+        news_tool = NaverNewsSearch()
+        news_tool.api_wrapper = mock_api_wrapper
+        result = news_tool._run("test query")
+        assert result == [{"title": "Specialized Result"}]
