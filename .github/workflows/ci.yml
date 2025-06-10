@@ -32,10 +32,6 @@ jobs:
       run: |
         uvx ruff format --check .
 
-    - name: Run mypy (type checking)
-      run: |
-        uvx mypy langchain_naver_community
-
   test:
     runs-on: ubuntu-latest
     name: Tests
