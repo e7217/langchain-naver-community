@@ -1,16 +1,20 @@
 """Tool for the Naver search API."""
 
-from typing import Dict, List, Optional, Type, Union
-from typing_extensions import Literal
+from __future__ import annotations
 
-from langchain_core.callbacks import (
-    AsyncCallbackManagerForToolRun,
-    CallbackManagerForToolRun,
-)
+from typing import TYPE_CHECKING
+
 from langchain_core.tools import BaseTool
 from pydantic import BaseModel, Field
+from typing_extensions import Literal
 
 from langchain_naver_community.utils import NaverSearchAPIWrapper
+
+if TYPE_CHECKING:
+    from langchain_core.callbacks import (
+        AsyncCallbackManagerForToolRun,
+        CallbackManagerForToolRun,
+    )
 
 
 class NaverInput(BaseModel):
@@ -57,7 +61,7 @@ class NaverSearchResults(BaseTool):
         "Useful for when you need to answer questions about Korean topics, news, blogs, etc. "
         "Input should be a search query in Korean or English."
     )
-    args_schema: Type[BaseModel] = NaverInput
+    args_schema: type[BaseModel] = NaverInput
     search_type: str = "news"
     display: int = 10
     start: int = 1
@@ -68,8 +72,8 @@ class NaverSearchResults(BaseTool):
     def _run(
         self,
         query: str,
-        run_manager: Optional[CallbackManagerForToolRun] = None,
-    ) -> Union[List[Dict], str]:
+        run_manager: CallbackManagerForToolRun | None = None,
+    ) -> list[dict] | str:
         """Use the tool."""
         try:
             return self.api_wrapper.results(
@@ -79,14 +83,14 @@ class NaverSearchResults(BaseTool):
                 start=self.start,
                 sort=self.sort,
             )
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             return repr(e)
 
     async def _arun(
         self,
         query: str,
-        run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
-    ) -> Union[List[Dict], str]:
+        run_manager: AsyncCallbackManagerForToolRun | None = None,
+    ) -> list[dict] | str:
         """Use the tool asynchronously."""
         try:
             return await self.api_wrapper.results_async(
@@ -96,7 +100,7 @@ class NaverSearchResults(BaseTool):
                 start=self.start,
                 sort=self.sort,
             )
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             return repr(e)
 
 
@@ -134,6 +138,7 @@ class NaverWebSearch(NaverSearchResults):
         "Input should be a search query in Korean or English."
     )
     search_type: str = "webkr"
+
 
 class NaverBookSearch(NaverSearchResults):
     """Tool specialized for Naver Book search."""
