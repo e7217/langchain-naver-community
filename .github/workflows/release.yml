@@ -26,10 +26,7 @@ jobs:
       run: pip install build twine hatch
 
     - name: Build package
-      run: |
-        VERSION=${GITHUB_REF#refs/tags/v}
-        hatch version $VERSION
-        hatch build
+      run: hatch build -t wheel
 
     - name: Check package
       run: twine check dist/*

@@ -4,7 +4,6 @@ build-backend = "hatchling.build"
 
 [project]
 name = "langchain-naver-community"
-version = "0.1.1"
 authors = [{ name = "Changyong Um", email = "eum6211@gmail.com" }]
 description = "Add your description here"
 license = "MIT"
@@ -20,12 +19,20 @@ dependencies = [
     "pydantic>=2.10.6",
 ]
 
+dynamic = ["version"]
+
 [project.optional-dependencies]
 test = [
     "pytest>=7.0.0",
     "pytest-asyncio>=0.21.0",
     "pytest-cov>=4.1.0",
 ]
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.version.vcs]
+tag-pattern = "v(?P<version>.+)" 
 
 [tool.hatch.build.targets.wheel]
 sources = ["langchain-naver-community"]
