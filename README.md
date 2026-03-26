@@ -1,5 +1,8 @@
 # 🦜️🔗Langchain Naver Community
 
+[![PyPI Downloads](https://static.pepy.tech/personalized-badge/langchain-naver-community?period=total&units=INTERNATIONAL_SYSTEM&left_color=GREY&right_color=BLUE&left_text=downloads)](https://pepy.tech/projects/langchain-naver-community)
+
+
 ## Welcome
 **Langchain Naver Community** is a Python package that integrates Naver's various APIs with LangChain, making it easier to build powerful applications using Naver's services within the LangChain ecosystem. This package provides a seamless interface to interact with Naver's APIs while leveraging LangChain's capabilities for building language model applications.
 
